@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { fsDb } from "../services/firebase";
 import { Card } from "antd";
-import moment from "moment";
 const { Meta } = Card;
 
 class HomePageCard extends React.Component {
@@ -16,6 +15,8 @@ class HomePageCard extends React.Component {
 
   fetchUserInfo = () => {
     const userArtInfo = this.props.art.user_id;
+    console.log("this.props", this.props);
+    console.log("userArtInfo", userArtInfo);
     const nameAndAge = fsDb
       .collection("user_profiles")
       .where("user_id", "==", userArtInfo)
@@ -23,12 +24,13 @@ class HomePageCard extends React.Component {
       .then((info) => {
         this.setState({ user: info.docs[0] ? info.docs[0].data() : null });
       });
+    console.log("paris");
   };
 
   renderCard = () => {
     const art = this.props.art;
     if (!this.state.user?.user_id) return null;
-    const dob = this.state?.user?.DOB;
+    // const dob = this.state?.user?.DOB;
     return (
       <Link
         to={{
@@ -37,7 +39,6 @@ class HomePageCard extends React.Component {
             userId: this.state.user?.user_id,
             name: this.state.user?.name,
             aboutme: this.state.user?.aboutme,
-            // DOB: this.state.user?.DOB,
             userImage: this.state.user?.userImage,
           },
         }}
@@ -45,11 +46,7 @@ class HomePageCard extends React.Component {
         <Card
           hoverable
           style={{ width: 400 }}
-          title={
-            this.state.user.name +
-            " | " +
-            moment(this.state.user?.DOB?.toDate()).toNow("Y")
-          }
+          title={this.state.user.name}
           cover={
             <img
               alt="example"
@@ -61,15 +58,6 @@ class HomePageCard extends React.Component {
           }
         >
           <Meta title={art.title} description="" /> <br />
-          {/* <h5>
-            {art.location.street_number +
-              ", " +
-              art.location.street +
-              ", " +
-              art.location.suburb +
-              " | " +
-              moment(art.time?.toDate()).format("MMMM Do YYYY")}
-          </h5> */}
         </Card>
       </Link>
     );

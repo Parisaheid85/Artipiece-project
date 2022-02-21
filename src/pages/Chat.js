@@ -7,6 +7,7 @@ import { getCurrentUser } from "../helpers/auth";
 // import moment from "moment";
 import { isEmpty } from "underscore";
 import { Card, Divider } from "antd";
+import ArtCard from "../components/ArtCard";
 import "../components/ArtCard.css";
 
 class Chat extends Component {

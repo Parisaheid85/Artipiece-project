@@ -18,7 +18,6 @@ class EditProfile extends Component {
       name: "",
       origin: "",
       aboutme: "",
-      photo: "",
       userImage: "",
       userDocId: "",
     };
@@ -68,6 +67,7 @@ class EditProfile extends Component {
 
   //////////////////////////////////   Upload File  //////////////////////////////
   uploadFile = (file) => {
+    console.log("file", file);
     const storageRef = storage.ref();
     const fileRef = storageRef.child(file.name);
     return fileRef.put(file).then(() => {

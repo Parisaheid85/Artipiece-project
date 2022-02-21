@@ -1,21 +1,79 @@
 import React, { Component } from "react";
-import { fsDb } from "../services/firebase";
+import { UploadOutlined } from "@ant-design/icons";
+import { fsDb, storage } from "../services/firebase";
 import { getCurrentUser } from "../helpers/auth";
-import moment from "moment";
-import { Input, Button, message } from "antd";
+import { Upload, Input, Button, message } from "antd";
 
 const { TextArea } = Input;
+
 class CreateArt extends Component {
   constructor() {
     super();
     this.state = {
       title: null,
       category: null,
-      origin: null,
+      price: null,
       description: null,
+      artImage: null,
+      artDocId: null,
+      userDocId: null,
+    };
+
+    this.uploadFile = this.uploadFile.bind(this);
+
+    this.uploadProps = {
+      name: "file",
+      action: this.uploadFile,
+      headers: {
+        authorization: "authorization-text",
+      },
     };
   }
-  ////////////////// create activity and save on db (firestore) //////////////////
+
+  componentDidMount() {
+    this.fetchUserInfo();
+  }
+
+  fetchUserInfo = () => {
+    fsDb
+      .collection("user_profiles")
+      .where("user_id", "==", getCurrentUser().uid)
+      .get()
+      .then((snapshots) => {
+        console.log(snapshots);
+        snapshots.forEach((f) => {
+          this.setState({
+            title: f.data().title,
+            category: f.data().category,
+            description: f.data().description,
+            price: f.data().price,
+            artImage: f.data().artImage,
+            userDocId: f.id,
+          });
+        });
+      });
+  };
+
+  uploadFile = (file) => {
+    console.log("file", file);
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(file.name);
+    return fileRef.put(file).then(() => {
+      fsDb
+        .collection("arts")
+        .doc(this.state.user_id)
+        .set(
+          { photo: `gs://artpiece-gallery.appspot.com/${file.name}` },
+          { merge: true }
+        )
+        .then((firebaseImage) => {
+          fileRef.getDownloadURL().then((url) => {
+            this.setState({ artImage: url });
+          });
+        });
+    });
+  };
+  ////////////////// create art and save on db (firestore) //////////////////
   saveArt = (data) => {
     fsDb
       .collection("arts")
@@ -23,20 +81,19 @@ class CreateArt extends Component {
       .set({
         title: data.title,
         category: data.category,
-        origin: data.origin,
+        price: data.price,
         description: data.description,
+        artImage: data.artImage,
         user_id: getCurrentUser().uid,
       })
       .then(() => {
-        console.log(
-          "Your artwork is now uploaded and visible on Artipiece Gallery!"
-        );
+        console.log("uploaded!");
       });
   };
 
   _handleSubmit = () => {
-    const { title, category, description } = this.state;
-    if (!title || !category || !description) {
+    const { title, category, description, artImage } = this.state;
+    if (!title || !category || !description || !artImage) {
       message.error("Please fill in required fields");
       return;
     }
@@ -51,8 +108,8 @@ class CreateArt extends Component {
   renderCategory = (event) => {
     this.setState({ category: event.target.value });
   };
-  renderOrigin = (event) => {
-    this.setState({ origin: event.target.value });
+  renderPrice = (event) => {
+    this.setState({ price: event.target.value });
   };
   renderDescription = (event) => {
     this.setState({ description: event.target.value });
@@ -72,7 +129,7 @@ class CreateArt extends Component {
           <span>Title:</span>
           <Input
             type="text"
-            placeholder="art name"
+            placeholder="Art name"
             style={{ width: "40%" }}
             onChange={this.renderTitle}
             required
@@ -85,12 +142,12 @@ class CreateArt extends Component {
             onChange={this.renderCategory}
             required
           />
-          <span style={{ marginTop: "20px" }}>Origin:</span>
+          <span style={{ marginTop: "20px" }}>Price:</span>
           <Input
             type="text"
-            placeholder="Origin"
+            placeholder="$$$"
             style={{ width: "30%" }}
-            onChange={this.renderOrigin}
+            onChange={this.renderPrice}
           />
           <span style={{ marginTop: "20px" }}>Description:</span>
           <TextArea
@@ -99,6 +156,11 @@ class CreateArt extends Component {
             onChange={this.renderDescription}
             required
           />
+          <Upload {...this.uploadProps}>
+            <Button style={{ marginTop: "20px" }} icon={<UploadOutlined />}>
+              Upload new Artwork
+            </Button>
+          </Upload>
           <Button
             style={{ marginTop: "20px" }}
             onClick={this._handleSubmit}

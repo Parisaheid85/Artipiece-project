@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { fsDb } from "../services/firebase";
+import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
-import { Button, Input, Typography } from "antd";
+import { Upload, Button, Input, Typography } from "antd";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -15,7 +16,7 @@ class EditArt extends Component {
       // this has been done to show the previous info in any fields (e.g. description content)
       title: props?.documentInfo?.title,
       category: props?.documentInfo?.category,
-      origin: props?.documentInfo?.origin,
+      price: props?.documentInfo?.price,
       description: props?.documentInfo?.description,
     };
   }
@@ -29,13 +30,13 @@ class EditArt extends Component {
         {
           title: data.title,
           category: data.category,
-          origin: data.origin,
+          price: data.price,
           description: data.description,
         },
         { merge: true }
       )
       .then(() => {
-        console.log("Activity successfully created!");
+        console.log("Art successfully created!");
       });
   };
 
@@ -53,8 +54,8 @@ class EditArt extends Component {
   renderCategory = (event) => {
     this.setState({ category: event.target.value });
   };
-  renderOrigin = (event) => {
-    this.setState({ origin: event.target.value });
+  renderPrice = (event) => {
+    this.setState({ price: event.target.value });
   };
   renderDescription = (event) => {
     this.setState({ description: event.target.value });
@@ -77,28 +78,33 @@ class EditArt extends Component {
           <Text>Category:</Text>
           <Input
             type="text"
-            placeholder="Running"
+            placeholder="Oil painting..."
             style={{ width: "40%", marginBottom: "20px" }}
             onChange={this.renderCategory}
             value={this.state.type}
             required
           />
-          <Text>Origin:</Text>
+          <Text>Price:</Text>
           <Input
-            type="text"
+            type="number"
             style={{ width: "40%", marginBottom: "20px" }}
-            onChange={this.renderOrigin}
+            onChange={this.renderPrice}
             required
           />
           <Text>Description:</Text>
           <TextArea
             type="text"
-            placeholder="Please provide a brief info about this activity"
+            placeholder="Please provide a brief info about this art"
             onChange={this.renderDescription}
             value={this.state.description}
             required
             style={{ marginBottom: "20px" }}
           />
+          <Upload {...this.uploadProps}>
+            <Button icon={<UploadOutlined />}>Upload new Artwork</Button>
+          </Upload>
+          <br />
+
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               style={{ marginRight: "10px" }}

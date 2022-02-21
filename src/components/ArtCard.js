@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { fsDb } from "../services/firebase";
-import moment from "moment";
 import { getCurrentUser } from "../helpers/auth";
-
 import { Card, Divider } from "antd";
 import "./ArtCard.css";
 import EditArt from "./EditArt";
@@ -52,7 +50,7 @@ class ArtCard extends Component {
     this.fetchArts();
   };
 
-  /////////////////////////////////////////// handles activities and Edit and Delete activity buttons ////////////////////////
+  /////////////////////////////////////////// handles arts and Edit and Delete art buttons ////////////////////////
   renderArts = () => {
     const arts = this.state.arts;
     if (this.props.userId === getCurrentUser().uid) {
@@ -61,8 +59,9 @@ class ArtCard extends Component {
           <div key={index} className="site-card-border-less-wrapper">
             <Card title={art.title} bordered={false}>
               <p>{art.description}</p>
-              <p>{art.origin}</p>
+              <p>{art.price}</p>
               <p>{art.category}</p>
+              <img src={art.artImage} alt="" />
             </Card>
             <div style={{ marginTop: "10px" }}>
               <EditArt
@@ -81,15 +80,16 @@ class ArtCard extends Component {
           <div key={index} className="site-card-border-less-wrapper">
             <Card title={art.title} bordered={false}>
               <p>{art.description}</p>
-              <p>{art.origin}</p>
+              <p>{art.price}</p>
               <p>{art.category}</p>
+              <img src={art.artImage} alt="" />
             </Card>
           </div>
         );
       });
     }
   };
-  ////////////////////////////////// renders activities //////////////////////////////
+  ////////////////////////////////// renders arts //////////////////////////////
   render() {
     return <div>{this.renderArts()}</div>;
   }

@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import { fsDb } from "../services/firebase";
 import { getCurrentUser } from "../helpers/auth";
 import Card from "../components/Card";
-
 import { Button } from "antd";
-import moment from "moment";
 import { Card } from "antd";
 const { Meta } = Card;
 
@@ -59,12 +57,6 @@ class PublicProfile extends Component {
                     {" "}
                     <strong> {state?.name} </strong>{" "}
                   </h1>
-                  <h4>
-                    {" "}
-                    {state.DOB && state.DOB.toDate
-                      ? moment(state.DOB.toDate()).format("MMMM Do YYYY")
-                      : null}{" "}
-                  </h4>
                 </div>
                 <div>
                   <Link
